@@ -139,6 +139,11 @@ export function listArchivedTasks(): Task[] {
     .all() as Task[];
 }
 
+export function getTopicById(id: number): Topic | undefined {
+  const db = getDb();
+  return db.prepare(`SELECT * FROM topics WHERE id = ?`).get(id) as Topic | undefined;
+}
+
 export function listTopics(): Topic[] {
   const db = getDb();
   return db
