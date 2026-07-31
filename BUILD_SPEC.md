@@ -21,7 +21,7 @@ checkpoint message, then update this table and stop for review.
 |---|-------|--------|--------|
 | 1 | Database schema | Complete | `80de7c9` |
 | 2 | Data access layer | Complete | `9c0be90` |
-| 3 | API routes | Not started | — |
+| 3 | API routes | Complete | `23d6be3` |
 | 4 | Frontend | Not started | — |
 | 5 | Persistence check | Not started | — |
 | 6 | Testing | Not started | — |
@@ -52,6 +52,14 @@ checkpoint message, then update this table and stop for review.
   `archiveTask` sets `archived_at` only; overdue derived in `isOverdue`, never
   stored. All DAL functions call `getDb()` per call so `resetDb()` in tests
   swaps the connection safely.
+
+- **2026-07-31 — Phase 3 complete** at `23d6be3`: REST API under `src/app/api/`
+  (`tasks` GET/POST, `tasks/[id]` GET/PATCH — no DELETE, `tasks/[id]/archive`
+  POST, `topics` GET/POST). Server-side validation in `src/lib/validation.ts`
+  (title required, `due_date` YYYY-MM-DD + real-date check, topic resolves to
+  an id, status ∈ the three values); 400/404/405/409 with clear messages.
+  Responses add a derived `overdue: boolean`. Added `getTopicById` to the DAL
+  for topic validation.
 
 ---
 
