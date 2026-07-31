@@ -1,5 +1,7 @@
-import { isOverdue, listTasks, type SortBy } from "../db/tasks";
+import { isOverdue, listTasks, listTopics, type SortBy } from "../db/tasks";
 import { SortControl } from "../components/sort-control";
+import { CreateTaskForm } from "../components/create-task-form";
+import { TaskRow } from "../components/task-row";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +16,8 @@ export default async function Home({
     raw === "topic" || raw === "status" || raw === "due_date"
       ? raw
       : "due_date";
-  const tasks = listTasks(current).map((task) => ({
+  const topics = listTopics();
+  const rows = listTasks(current).map((task) => ({
     ...task,
     overdue: isOverdue(task),
   }));
@@ -22,6 +25,7 @@ export default async function Home({
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-4 p-6">
       <h1 className="text-2xl font-bold">Tasks</h1>
+      <CreateTaskForm topics={topics} />
       <div className="flex items-center gap-2">
         <label htmlFor="sortBy">Sort by</label>
         <SortControl current={current} />
@@ -33,32 +37,20 @@ export default async function Home({
             <th className="py-2 pr-3">Description</th>
             <th className="py-2 pr-3">Topic</th>
             <th className="py-2 pr-3">Due date</th>
-            <th className="py-2">Status</th>
+            <th className="py-2 pr-3">Status</th>
+            <th className="py-2">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {tasks.length === 0 ? (
+          {rows.length === 0 ? (
             <tr>
-              <td colSpan={5} className="py-3 text-zinc-500">
+              <td colSpan={6} className="py-3 text-zinc-500">
                 No tasks yet.
               </td>
             </tr>
           ) : (
-            tasks.map((task) => (
-              <tr key={task.id} className="border-b">
-                <td className="py-2 pr-3">{task.title}</td>
-                <td className="py-2 pr-3">{task.description}</td>
-                <td className="py-2 pr-3">{task.topic_name}</td>
-                <td className="py-2 pr-3">
-                  {task.due_date}
-                  {task.overdue ? (
-                    <span className="ml-2 font-semibold text-red-600">
-                      Overdue
-                    </span>
-                  ) : null}
-                </td>
-                <td className="py-2">{task.status}</td>
-              </tr>
+            rows.map((task) => (
+              <TaskRow key={task.id} task={task} topics={topics} />
             ))
           )}
         </tbody>
