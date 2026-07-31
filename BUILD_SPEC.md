@@ -22,7 +22,7 @@ checkpoint message, then update this table and stop for review.
 | 1 | Database schema | Complete | `80de7c9` |
 | 2 | Data access layer | Complete | `9c0be90` |
 | 3 | API routes | Complete | `23d6be3` |
-| 4 | Frontend | Not started | — |
+| 4 | Frontend | Complete | `0458162`, `662dde1`, `b7ef337` |
 | 5 | Persistence check | Not started | — |
 | 6 | Testing | Not started | — |
 | 7 | Documentation | Not started | — |
@@ -60,6 +60,19 @@ checkpoint message, then update this table and stop for review.
   an id, status ∈ the three values); 400/404/405/409 with clear messages.
   Responses add a derived `overdue: boolean`. Added `getTopicById` to the DAL
   for topic validation.
+
+- **2026-07-31 — Phase 4 complete** at `0458162`, `662dde1`, `b7ef337`:
+  - `0458162` list page + sort control + nav: `src/app/page.tsx` is a server
+    component reading `searchParams.sortBy` (default `due_date`); tasks come
+    from the DAL directly with `overdue` computed server-side via `isOverdue`;
+    `src/components/sort-control.tsx` (client) navigates to `/?sortBy=` to
+    re-fetch. Pages export `export const dynamic = "force-dynamic"`.
+  - `662dde1` create/edit forms: `src/components/create-task-form.tsx` (topic
+    dropdown with "+ new topic" text input; POSTs to `/api/tasks` then
+    `router.refresh()`); `src/components/task-row.tsx` with inline edit form
+    (PATCH), status `<select>` limited to the three values, and archive button.
+  - `b7ef337` `src/app/archived/page.tsx` renders `listArchivedTasks()`.
+  - `next build` verified: all pages/routes render dynamic (ƒ).
 
 ---
 
