@@ -76,6 +76,103 @@ checkpoint message, then update this table and stop for review.
 
 ---
 
+## Handoff — session 2 (read this first)
+
+### Current state (end of session 1, 2026-07-31)
+
+- **Working tree is clean.** Git history (10 commits):
+  `37a9931` scaffold → `80de7c9` → `9c0be90` → `168627f` (tracker) → `23d6be3`
+  → `369c6a7` (tracker) → `0458162` → `662dde1` → `b7ef337` → `e42bc79` (tracker).
+  All code lives on `main`.
+- **Done:** phases 1–4. **Remaining:** 5 (persistence check), 6 (tests), 7 (docs),
+  8 (AI transcripts), 9 (final checklist).
+- `node -v` = **v24.14.1** (state "Node 24.x" in `docs/running-it.md`),
+  `npm -v` = 11.11.0. `better-sqlite3@13.0.2` confirmed working on Node 24.
+- This is a modified Next.js (16.2.12). Per `AGENTS.md`, read
+  `node_modules/next/dist/docs/` before writing Next code. Key 16.x facts
+  already relied upon: `params`/`searchParams` are **Promises** (must
+  `await`); type them explicitly (`{ params: Promise<{ id: string }> }`) or
+  use the generated global helpers `RouteContext`/`PageProps`; pages that read
+  the SQLite DB must `export const dynamic = "force-dynamic"` (sync DB reads
+  are invisible to prerender detection); Route Handlers are dynamic by
+  default.
+
+### Verification commands
+
+- `npm run lint` and `npx tsc --noEmit` — run after every change.
+- `npm run build` — full production build (verified green; all routes render
+  dynamic). Type-safe, catches client/server boundary mistakes tsc alone
+  misses.
+- Smoke-test TS quickly with `npx --yes tsx <file>` — plain `node <file.ts>`
+  type-stripping **fails on extensionless imports** (`./index`), so use tsx.
+- Live API check (optional): set `$env:DB_PATH` to a temp file, start
+  `cmd /c "npm run dev -- -p 3123"`, curl the endpoints, then kill stray
+  processes with `Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*3123*" } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }`.
+  Delete any `data/` / temp `.db` afterwards. NOTE: in this repo a `data/`
+  dir may be created on first real run — it is gitignored.
+
+### Conventions to keep honouring
+
+- One phase at a time → verify → commit with the phase's exact checkpoint
+  message → update the Progress tracker table + add a progress note → commit
+  `Track phase completion in BUILD_SPEC` → stop for review.
+- DAL functions call `getDb()` per call (never a module-level captured
+  connection) so test `resetDb()` swaps safely. No `deleteTask` anywhere; no
+  stored `overdue`; status only the 3 values; archiving only sets
+  `archived_at`.
+- Relative imports (not `@/`) so vitest needs no alias plugin. API route
+  import depth is off-by-one-prone — recount the `..`:
+  `src/app/api/tasks/route.ts`→`../../../db/tasks`;
+  `src/app/api/tasks/[id]/route.ts`→`../../../../db/tasks`;
+  `src/app/api/tasks/[id]/archive/route.ts`→`../../../../../db/tasks`;
+  `src/app/api/topics/route.ts`→`../../../db/tasks`.
+
+### Phase 5 — persistence check (next)
+
+Manually: `npm run dev` (default `DB_PATH` → creates `data/app.db`), create a
+task, restart the server, confirm it persists; edit + reload; archive → gone
+from `/`, present at `/archived`. This mirrors walkthrough steps 3/4/7. If the
+developer prefers, the agent can automate it (temp DB, restart dev server,
+curl API).
+
+### Phase 6 — tests (plan)
+
+- `npm install -D vitest` (only new dep needed; node env, no jsdom/react).
+- `vitest.config.mts`: `export default defineConfig({ test: { environment: "node" } })`.
+- Add `"test": "vitest run"` to `package.json` scripts.
+- Tests in `src/db/tasks.test.ts` (+ optional `src/app/api/tasks.test.ts` for
+  the route-handler create/list/sort test — `next/server` already loads in
+  plain node, verified). Use `beforeEach(() => resetDb(":memory:"))` — throwaway
+  DB, never the dev DB. Required coverage: create→list round-trip; archive
+  (active vs `listArchivedTasks`); `isOverdue` past+todo→true / complete→false;
+  optional `sortBy=due_date` ascending.
+- Commit checkpoint 5 message: `Add test suite with throwaway DB fixture, covering archive and overdue rules`.
+
+### Phase 7 — docs (plan)
+
+`docs/third-party-code.md` (better-sqlite3 + vitest, one sentence each),
+`docs/database-design.md` (copy the shipped schema from Section 1, the two
+tables + FK, constrained status, archiving as timestamp, overdue derived not
+stored), `docs/running-it.md` (Node 24.x, clone/install/dev/test, note DB is
+auto-created on first run — no manual setup). Then verify against a clean
+clone in a fresh folder. Commit checkpoint 6 message:
+`Add third-party code, database design, and running-it documentation`.
+
+### Phase 8–9 — transcripts and final checklist
+
+- This document + the saved conversation(s) are the AI-usage transcript.
+  Evidence needed: constraints stated up front (this doc), a clear instance of
+  rejecting/correcting an AI proposal, decisions traceable to shipped code.
+  If any future proposal drifts from Section 1 (e.g. storing `overdue`, a
+  `deleteTask`, a fourth status, moving archived rows to another table),
+  **reject it explicitly in the conversation** and record it here — that
+  rejection is the grading evidence.
+- Phase 9: run the checklist at the bottom of this file. Commit count already
+  exceeds the "at least 6, spread across more than one sitting" bar; later
+  sessions add more.
+
+---
+
 ## 0. Context already in place
 
 - Next.js has already been scaffolded (App Router, TypeScript) into this repo.
