@@ -43,6 +43,31 @@ checkpoint message, then update this table and stop for review.
   - Tests will run under `vitest` in the `node` environment (no jsdom) with
     `resetDb(":memory:")`, and use relative imports (no vite alias plugin).
 
+- **2026-08-01 — Session 2 (bug fix + UI revamp):** No new phases shipped;
+  phases 1–4 remain complete. Work performed this sitting:
+  - Fixed a runtime TypeError in `src/components/create-task-form.tsx`:
+    `e.currentTarget` is `null` after `await` (React nulls the synthetic
+    event's `currentTarget` once the async handler yields). Captured `formEl`
+    before the `await` and reset via that reference.
+  - Dark-mode UI revamp (developer-requested, cosmetic — no effect on the
+    functional walkthrough): forced dark scheme in `globals.css`
+    (`color-scheme: dark`, removed the light-mode media query); status
+    colour-coding via new `src/components/status-badge.tsx` (amber=todo,
+    sky=in_progress, emerald=complete) plus a matching coloured left border on
+    each active task row; four stat-tracker cards on the list page (total /
+    to start / in progress / completed, computed server-side from active
+    tasks); new `src/components/nav.tsx` (sticky blurred header with an
+    active-link pill); dark-styled create form, sort control, and archived
+    view.
+  - Added a "next status" advance button beside each task's status badge
+    (todo → in_progress → complete; hidden once complete) that PATCHes and
+    calls `router.refresh()`.
+  - Verified with `npm run lint`, `npx tsc --noEmit`, `npm run build`, plus a
+    live render check on the running dev server.
+  - Developer added `AIUSAGE.md` (the AI-usage transcript, phase 8 evidence)
+    and emptied `README.md` (its scaffold boilerplate is superseded by
+    `docs/running-it.md` when phase 7 lands).
+
 ### Progress note (updated with each phase)
 
 - **2026-07-31 — Phase 2 complete** at `9c0be90`: `src/db/tasks.ts` shipped
@@ -78,14 +103,16 @@ checkpoint message, then update this table and stop for review.
 
 ## Handoff — session 2 (read this first)
 
-### Current state (end of session 1, 2026-07-31)
+### Current state (after session 2, 2026-08-01)
 
-- **Working tree is clean.** Git history (10 commits):
+- **Working tree contains session 2 changes** (bug fix + UI revamp; see Session
+  log). Git history (10 commits, all on `main`):
   `37a9931` scaffold → `80de7c9` → `9c0be90` → `168627f` (tracker) → `23d6be3`
-  → `369c6a7` (tracker) → `0458162` → `662dde1` → `b7ef337` → `e42bc79` (tracker).
-  All code lives on `main`.
+  → `369c6a7` (tracker) → `0458162` → `662dde1` → `b7ef337` → `e42bc79` (tracker)
+  → `1aa223e` (handoff notes). Uncommitted: the session 2 code changes,
+  `AIUSAGE.md`, and the emptied `README.md`.
 - **Done:** phases 1–4. **Remaining:** 5 (persistence check), 6 (tests), 7 (docs),
-  8 (AI transcripts), 9 (final checklist).
+  8 (AI transcripts — `AIUSAGE.md` draft exists), 9 (final checklist).
 - `node -v` = **v24.14.1** (state "Node 24.x" in `docs/running-it.md`),
   `npm -v` = 11.11.0. `better-sqlite3@13.0.2` confirmed working on Node 24.
 - This is a modified Next.js (16.2.12). Per `AGENTS.md`, read

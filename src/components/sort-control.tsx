@@ -15,7 +15,7 @@ export function SortControl({ current }: { current: SortBy }) {
     <select
       value={current}
       onChange={(e) => router.push(`/?sortBy=${e.target.value}`)}
-      className="rounded border border-zinc-300 px-2 py-1"
+      className="rounded-md border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-200 outline-none transition-colors focus:border-zinc-500"
     >
       {OPTIONS.map((option) => (
         <option key={option.value} value={option.value}>
