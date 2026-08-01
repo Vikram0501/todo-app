@@ -101,18 +101,31 @@ checkpoint message, then update this table and stop for review.
 
 ---
 
-## Handoff — session 2 (read this first)
+## Handoff — session 3 (read this first)
 
-### Current state (after session 2, 2026-08-01)
+### Current state (end of session 2, 2026-08-01)
 
-- **Working tree contains session 2 changes** (bug fix + UI revamp; see Session
-  log). Git history (10 commits, all on `main`):
+- **Working tree is clean** (all session 2 changes committed). Git history (11
+  commits, all on `main`):
   `37a9931` scaffold → `80de7c9` → `9c0be90` → `168627f` (tracker) → `23d6be3`
   → `369c6a7` (tracker) → `0458162` → `662dde1` → `b7ef337` → `e42bc79` (tracker)
-  → `1aa223e` (handoff notes). Uncommitted: the session 2 code changes,
-  `AIUSAGE.md`, and the emptied `README.md`.
+  → `1aa223e` (handoff notes) → `6b279f8` (bug fix + UI revamp + AIUSAGE/README).
 - **Done:** phases 1–4. **Remaining:** 5 (persistence check), 6 (tests), 7 (docs),
   8 (AI transcripts — `AIUSAGE.md` draft exists), 9 (final checklist).
+- **Next action (session 3):** Phase 5 — persistence check. Prefer the automated
+  route (temp `DB_PATH`, restart dev server, curl the API) or the manual route;
+  then mark Phase 5 complete in the tracker, add a progress note, and stop for
+  review before Phase 6 (tests).
+- **Known quirks to remember this sitting:**
+  - Session 2 changed the UI: status is now a colour-coded badge (amber=todo,
+    sky=in_progress, emerald=complete) with a coloured left border per row and a
+    "next status" advance button; status editing remains only in the edit form's
+    `<select>` (still the 3 fixed values). The page shows 4 stat cards (total /
+    to start / in progress / completed). Dark mode is forced via `globals.css`
+    (`color-scheme: dark`).
+  - A dev server may already be running on port 3000 (PID 20332) — do not kill
+    it; use it to sanity-check renders. If starting a second server for tests,
+    use `-p 3123` with a temp `DB_PATH`.
 - `node -v` = **v24.14.1** (state "Node 24.x" in `docs/running-it.md`),
   `npm -v` = 11.11.0. `better-sqlite3@13.0.2` confirmed working on Node 24.
 - This is a modified Next.js (16.2.12). Per `AGENTS.md`, read
