@@ -12,7 +12,7 @@ export function Nav() {
   const pathname = usePathname();
   return (
     <header className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-950/80 px-6 py-3 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-4xl items-center gap-6">
+      <div className="mx-auto flex w-full max-w-5xl items-center gap-6">
         <span className="text-sm font-bold tracking-tight">Todo</span>
         <nav className="flex gap-1">
           {LINKS.map((link) => {

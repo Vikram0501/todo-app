@@ -166,7 +166,7 @@ export function TaskRow({ task, topics }: { task: TaskRowData; topics: Topic[] }
         {task.description || "—"}
       </td>
       <td className="px-4 py-3">{task.topic_name}</td>
-      <td className="px-4 py-3">
+      <td className="whitespace-nowrap px-4 py-3">
         <span
           className={
             task.overdue
@@ -188,7 +188,7 @@ export function TaskRow({ task, topics }: { task: TaskRowData; topics: Topic[] }
           </span>
         ) : null}
       </td>
-      <td className="px-4 py-3">
+      <td className="whitespace-nowrap px-4 py-3">
         <div className="flex items-center gap-2">
           <StatusBadge status={task.status} />
           {NEXT_STATUS[task.status] ? (
