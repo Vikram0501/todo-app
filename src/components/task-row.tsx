@@ -5,7 +5,7 @@ import { useState, type FormEvent } from "react";
 import type { Task, TaskStatus, Topic } from "../db/tasks";
 import { StatusBadge, STATUS_META } from "./status-badge";
 
-export type TaskRowData = Task & { overdue: boolean };
+export type TaskRowData = Task & { overdue: boolean; dueSoon: boolean };
 
 const STATUS_OPTIONS: TaskStatus[] = ["todo", "in_progress", "complete"];
 
@@ -167,12 +167,24 @@ export function TaskRow({ task, topics }: { task: TaskRowData; topics: Topic[] }
       </td>
       <td className="px-4 py-3">{task.topic_name}</td>
       <td className="px-4 py-3">
-        <span className={task.overdue ? "text-red-400" : undefined}>
+        <span
+          className={
+            task.overdue
+              ? "text-red-400"
+              : task.dueSoon
+                ? "text-orange-400"
+                : undefined
+          }
+        >
           {task.due_date}
         </span>
         {task.overdue ? (
           <span className="ml-2 rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-semibold text-red-400">
             Overdue
+          </span>
+        ) : task.dueSoon ? (
+          <span className="ml-2 rounded-full bg-orange-500/10 px-2 py-0.5 text-xs font-semibold text-orange-400">
+            Due soon
           </span>
         ) : null}
       </td>

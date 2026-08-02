@@ -1,29 +1,10 @@
-import { isOverdue, listTasks, listTopics, type SortBy } from "../db/tasks";
+import { isDueSoon, isOverdue, listTasks, listTopics, type SortBy } from "../db/tasks";
 import { SortControl } from "../components/sort-control";
 import { CreateTaskForm } from "../components/create-task-form";
 import { TaskRow } from "../components/task-row";
+import { StatusDonut } from "../components/status-donut";
 
 export const dynamic = "force-dynamic";
-
-function StatCard({
-  label,
-  value,
-  dot,
-}: {
-  label: string;
-  value: number;
-  dot: string;
-}) {
-  return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
-      <div className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-zinc-500">
-        <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
-        {label}
-      </div>
-      <p className="mt-2 text-2xl font-bold tabular-nums">{value}</p>
-    </div>
-  );
-}
 
 export default async function Home({
   searchParams,
@@ -40,6 +21,7 @@ export default async function Home({
   const rows = listTasks(current).map((task) => ({
     ...task,
     overdue: isOverdue(task),
+    dueSoon: isDueSoon(task),
   }));
 
   const stats = {
@@ -58,15 +40,13 @@ export default async function Home({
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Total tasks" value={stats.total} dot="bg-zinc-400" />
-        <StatCard label="To start" value={stats.todo} dot="bg-amber-400" />
-        <StatCard
-          label="In progress"
-          value={stats.inProgress}
-          dot="bg-sky-400"
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
+        <StatusDonut
+          total={stats.total}
+          todo={stats.todo}
+          inProgress={stats.inProgress}
+          complete={stats.complete}
         />
-        <StatCard label="Completed" value={stats.complete} dot="bg-emerald-400" />
       </div>
 
       <CreateTaskForm topics={topics} />
