@@ -25,7 +25,7 @@ checkpoint message, then update this table and stop for review.
 | 4 | Frontend | Complete | `0458162`, `662dde1`, `b7ef337` |
 | 5 | Persistence check | Complete | — (manual, no commit) |
 | 6 | Testing | Complete | `145db94` |
-| 7 | Documentation | Not started | — |
+| 7 | Documentation | Complete | `77d3fc7` |
 | 8 | AI usage transcripts | Not started | — |
 | 9 | Final pre-submission checklist | Not started | — |
 
@@ -122,6 +122,25 @@ checkpoint message, then update this table and stop for review.
   active list on `/` but remained viewable at `/archived`. No code changes —
   Phase 5 is a manual verification with no commit checkpoint, so only the
   tracker is updated.
+
+- **2026-08-02 — Session 6 (Phase 7 documentation):** Phase 7 complete at
+  `77d3fc7`. Created `/docs` with the three graded files: `third-party-code.md`
+  (names `better-sqlite3`, `@types/better-sqlite3`, `vitest` — everything
+  beyond the scaffold — one specific reason each), `database-design.md`
+  (shipped schema copied verbatim + prose on the two tables/FK,
+  CHECK-constrained status, archive-as-timestamp-not-deletion/copy, and
+  `overdue` derived at read time and never stored), and `running-it.md`
+  (Node 24.x, `git clone https://github.com/Vikram0501/todo-app.git`, `npm
+  install`, explicit "no manual DB setup — `data/app.db` auto-created from
+  `schema.sql`", `npm run dev` → `http://localhost:3000`, `npm test`).
+  Verified per the spec from a **fresh clone** in a temp folder: `npm install`
+  (402 pkgs), `npm test` 10/10 pass, `npm run dev -p 3123` served `/`,
+  `/archived`, `/api/tasks` (all 200), and the DB auto-created on first run;
+  server killed and temp clone removed afterwards. Also committed the
+  developer's intentional deletion of the stale `AIUSAGE.md` draft separately
+  (`3fd713c`) so Phase 8's transcript can be rebuilt fresh from this
+  conversation. Working tree clean. Remaining: Phase 8 (AI usage transcripts),
+  Phase 9 (final checklist).
 
 ### Progress note (updated with each phase)
 
