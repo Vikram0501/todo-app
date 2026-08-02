@@ -195,3 +195,17 @@ export function isOverdue(
   const today = new Date().toISOString().slice(0, 10);
   return task.due_date < today;
 }
+
+export function isDueSoon(
+  task: Pick<Task, "status" | "archived_at" | "due_date">
+): boolean {
+  if (task.status === "complete" || task.archived_at || isOverdue(task)) {
+    return false;
+  }
+  const now = new Date();
+  const today = now.toISOString().slice(0, 10);
+  const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10);
+  return task.due_date === today || task.due_date === tomorrow;
+}

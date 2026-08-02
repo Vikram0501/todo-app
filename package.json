@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "clean": "node -e \"fs.rmSync('.next',{recursive:true,force:true})\"",
+    "lint": "eslint",
+    "test": "vitest run"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.2",
@@ -23,6 +25,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }
