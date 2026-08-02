@@ -176,38 +176,43 @@ checkpoint message, then update this table and stop for review.
 
 ---
 
-## Handoff — session 3 (read this first)
+## Handoff — session 6 (read this first)
 
-### Current state (end of session 2, 2026-08-01)
+### Current state (end of session 5, 2026-08-02)
 
-- **Working tree is clean** (all session 2 changes committed). Git history (11
-  commits, all on `main`):
+- **Working tree is clean** (all changes through session 5 are committed). Git
+  history (17 commits, all on `main`):
   `37a9931` scaffold → `80de7c9` → `9c0be90` → `168627f` (tracker) → `23d6be3`
-  → `369c6a7` (tracker) → `0458162` → `662dde1` → `b7ef337` → `e42bc79` (tracker)
-  → `1aa223e` (handoff notes) → `6b279f8` (bug fix + UI revamp + AIUSAGE/README).
-- **Done:** phases 1–4. **Remaining:** 5 (persistence check), 6 (tests), 7 (docs),
-  8 (AI transcripts — `AIUSAGE.md` draft exists), 9 (final checklist).
-- **Next action (session 3):** Phase 5 — persistence check. Prefer the automated
-  route (temp `DB_PATH`, restart dev server, curl the API) or the manual route;
-  then mark Phase 5 complete in the tracker, add a progress note, and stop for
-  review before Phase 6 (tests).
+  → `369c6a7` (tracker) → `0458162` → `662dde1` → `b7ef337` → `e42bc79`
+  (tracker) → `1aa223e` (handoff) → `6b279f8` (bug fix + UI revamp +
+  AIUSAGE/README) → `4c7ac3e` (handoff) → `145db94` (test suite + `isDueSoon`)
+  → `48716ad` (donut + due-soon UI) → `90d750c` (tracker) → `399d6f5` (tracker).
+- **Done:** phases 1–6. **Remaining:** 7 (docs), 8 (AI transcripts —
+  `AIUSAGE.md` draft exists), 9 (final checklist).
+- **Next action (session 6):** Phase 7 — documentation. Write the three `/docs`
+  files as planned below, then **verify against a clean clone in a fresh
+  folder** — that verification is literally how it's marked (functional
+  walkthrough step 1, and the top band of the Documentation rubric requires
+  it). Commit checkpoint 6, update the tracker, stop for review.
 - **Known quirks to remember this sitting:**
-  - Session 2 changed the UI: status is now a colour-coded badge (amber=todo,
-    sky=in_progress, emerald=complete) with a coloured left border per row and a
-    "next status" advance button; status editing remains only in the edit form's
-    `<select>` (still the 3 fixed values). The page shows 4 stat cards (total /
-    to start / in progress / completed). Dark mode is forced via `globals.css`
-    (`color-scheme: dark`).
+  - Session 4 changed the UI on `/`: the four stat cards were replaced by one
+    combined "Total tasks" tracker card holding a single-segment donut
+    (amber=todo, sky=in_progress, emerald=complete) with the total in the
+    centre and a 3-row legend (count + %). `src/components/status-donut.tsx`
+    is a pure-SVG server component (no client JS, no chart dependency).
+  - New "Due soon" indicator: derived `isDueSoon(task)` (due today or
+    tomorrow, and not complete/archived/overdue). Task rows show an orange
+    "Due soon" pill; the red "Overdue" pill wins when both could apply.
+  - `npm test` (vitest, node env) runs 10 tests against `resetDb(":memory:")`.
+  - **Stale-`.next` 404 symptom (hit 2026-08-02):** if a dev server only
+    serves `/` and 404s every other route (`/archived`, `/api/*`), the running
+    server's route table is out of sync with the filesystem — usually `.next`
+    survived an unclean shutdown. This is **not** a data-persistence problem
+    (the DB/WAL data is intact). Remedy: kill the dev-server process tree, run
+    `npm run clean` (deletes `.next`; regenerates on next start), restart
+    `npm run dev`.
   - A dev server may already be running on port 3000 — use it to sanity-check
-    renders. If starting a second server for tests, use `-p 3123` with a temp
-    `DB_PATH`.
-  - **Stale-`.next` 404 symptom (hit 2026-08-02):** if a dev server only serves
-    `/` and returns 404 for every other route (`/archived`, `/api/*`), the
-    running server's route table is out of sync with the filesystem — usually
-    `.next` survived an unclean shutdown. This is **not** a data-persistence
-    problem (the DB/WAL data is intact). Remedy: kill the dev server process
-    tree, run `npm run clean` (deletes `.next`; regenerates on next start), then
-    restart `npm run dev`.
+    renders. For a second server use `-p 3123` with a temp `DB_PATH`.
 - `node -v` = **v24.14.1** (state "Node 24.x" in `docs/running-it.md`),
   `npm -v` = 11.11.0. `better-sqlite3@13.0.2` confirmed working on Node 24.
 - This is a modified Next.js (16.2.12). Per `AGENTS.md`, read
@@ -222,6 +227,7 @@ checkpoint message, then update this table and stop for review.
 ### Verification commands
 
 - `npm run lint` and `npx tsc --noEmit` — run after every change.
+- `npm test` — vitest suite (10 tests, throwaway in-memory DB).
 - `npm run build` — full production build (verified green; all routes render
   dynamic). Type-safe, catches client/server boundary mistakes tsc alone
   misses.
@@ -248,50 +254,50 @@ checkpoint message, then update this table and stop for review.
   `src/app/api/tasks/[id]/route.ts`→`../../../../db/tasks`;
   `src/app/api/tasks/[id]/archive/route.ts`→`../../../../../db/tasks`;
   `src/app/api/topics/route.ts`→`../../../db/tasks`.
+- Docs are graded for specificity — name the actual schema, actual
+  dependencies, and actual commands; generic/templated content scores lower.
 
-### Phase 5 — persistence check (next)
+### Phase 7 — documentation (next)
 
-Manually: `npm run dev` (default `DB_PATH` → creates `data/app.db`), create a
-task, restart the server, confirm it persists; edit + reload; archive → gone
-from `/`, present at `/archived`. This mirrors walkthrough steps 3/4/7. If the
-developer prefers, the agent can automate it (temp DB, restart dev server,
-curl API).
+Create a `/docs` folder with three files:
 
-### Phase 6 — tests (plan)
+1. **`docs/third-party-code.md`** — every package installed beyond the Next.js
+   scaffold (not the scaffold's own deps), one sentence on why each:
+   `better-sqlite3` (sync SQLite driver; no separate DB server, fits a
+   single-user local-first app, sync API avoids async plumbing in Route
+   Handlers) and `vitest` (fast startup, native TS/ESM support, gives the
+   documented single test command).
+2. **`docs/database-design.md`** — copy the shipped schema from Section 1 (the
+   two tables `topics`/`tasks`, FK `tasks.topic_id`, the `CHECK`-constrained
+   status, `archived_at` timestamp, the three indexes) and in prose describe:
+   the two tables and the FK; why status is constrained but not a separate
+   table; how archiving works (flag/timestamp, never deletion, never a copy
+   table); how overdue is derived (`due_date < today AND status != 'complete'
+   AND archived_at IS NULL`) and that it is **not stored** anywhere.
+3. **`docs/running-it.md`** — must start the app from a clean clone with
+   nothing else to hand: exact Node version (24.x — `node -v` = v24.14.1),
+   `git clone <url>`, `npm install`, **no manual DB setup** (the app
+   auto-creates `data/app.db` from `schema.sql` on first run — say this
+   explicitly), `npm run dev`, open `http://localhost:3000`, `npm test`.
 
-- `npm install -D vitest` (only new dep needed; node env, no jsdom/react).
-- `vitest.config.mts`: `export default defineConfig({ test: { environment: "node" } })`.
-- Add `"test": "vitest run"` to `package.json` scripts.
-- Tests in `src/db/tasks.test.ts` (+ optional `src/app/api/tasks.test.ts` for
-  the route-handler create/list/sort test — `next/server` already loads in
-  plain node, verified). Use `beforeEach(() => resetDb(":memory:"))` — throwaway
-  DB, never the dev DB. Required coverage: create→list round-trip; archive
-  (active vs `listArchivedTasks`); `isOverdue` past+todo→true / complete→false;
-  optional `sortBy=due_date` ascending.
-- Commit checkpoint 5 message: `Add test suite with throwaway DB fixture, covering archive and overdue rules`.
-
-### Phase 7 — docs (plan)
-
-`docs/third-party-code.md` (better-sqlite3 + vitest, one sentence each),
-`docs/database-design.md` (copy the shipped schema from Section 1, the two
-tables + FK, constrained status, archiving as timestamp, overdue derived not
-stored), `docs/running-it.md` (Node 24.x, clone/install/dev/test, note DB is
-auto-created on first run — no manual setup). Then verify against a clean
-clone in a fresh folder. Commit checkpoint 6 message:
+Then **re-run these exact commands from a fresh clone in a different folder**
+and confirm the app starts and `npm test` passes. Commit checkpoint 6:
 `Add third-party code, database design, and running-it documentation`.
 
 ### Phase 8–9 — transcripts and final checklist
 
 - This document + the saved conversation(s) are the AI-usage transcript.
-  Evidence needed: constraints stated up front (this doc), a clear instance of
-  rejecting/correcting an AI proposal, decisions traceable to shipped code.
+  Evidence already on hand: constraints stated up front (this doc), plus two
+  clear instances of correcting/rejecting AI output — the `isDueSoon` bug the
+  test suite caught (session 4 log) and the stale-`.next` misdiagnosis
+  rejected in session 3 (it was **not** a data-persistence failure).
+  `AIUSAGE.md` is the draft to complete.
   If any future proposal drifts from Section 1 (e.g. storing `overdue`, a
   `deleteTask`, a fourth status, moving archived rows to another table),
   **reject it explicitly in the conversation** and record it here — that
   rejection is the grading evidence.
-- Phase 9: run the checklist at the bottom of this file. Commit count already
-  exceeds the "at least 6, spread across more than one sitting" bar; later
-  sessions add more.
+- Phase 9: run the checklist at the bottom of this file. Commit count (17)
+  already exceeds the "at least 6, spread across more than one sitting" bar.
 
 ---
 
