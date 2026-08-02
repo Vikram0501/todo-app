@@ -24,7 +24,7 @@ checkpoint message, then update this table and stop for review.
 | 3 | API routes | Complete | `23d6be3` |
 | 4 | Frontend | Complete | `0458162`, `662dde1`, `b7ef337` |
 | 5 | Persistence check | Not started | — |
-| 6 | Testing | Not started | — |
+| 6 | Testing | Complete | `145db94` |
 | 7 | Documentation | Not started | — |
 | 8 | AI usage transcripts | Not started | — |
 | 9 | Final pre-submission checklist | Not started | — |
@@ -68,6 +68,53 @@ checkpoint message, then update this table and stop for review.
     and emptied `README.md` (its scaffold boilerplate is superseded by
     `docs/running-it.md` when phase 7 lands).
 
+- **2026-08-02 — Session 3 (dev-server fix + hardening):** No new phases
+  shipped; phases 1–4 remain complete. Work performed this sitting:
+  - Diagnosed a reported `/archived` 404. Confirmed the data **had** persisted
+    (2 tasks + 1 topic read back from `data/app.db` via a read-only query; data
+    lives in the 127 KB `app.db-wal`). The real cause was a stale dev server:
+    it served only `/` and 404'd `/archived` *and* `/api/tasks`, with `.next`
+    artifacts from a prior session (07/31–08/01) — the in-memory route table
+    was out of sync with the filesystem after an unclean shutdown.
+  - Fix applied: killed the dev-server process tree, deleted `.next`, restarted
+    `npm run dev`; developer confirmed all routes work again. Server was then
+    stopped.
+  - Hardening: added `npm run clean` (`node -e "fs.rmSync('.next',...)")`,
+    cross-platform under cmd/PowerShell) to `package.json`, and documented the
+    symptom + remedy in the "Known quirks" list so a future session recognises
+    it immediately.
+
+- **2026-08-02 — Session 4 (UI features + Phase 6 tests):** No new phases
+  shipped until Phase 6, which landed at the end of this sitting. Work done:
+  - Developer-requested UI, part 1 — status-proportion chart: the four stat
+    cards on `/` were replaced by one combined "Total tasks" tracker card
+    holding a single-segment donut (amber=todo, sky=in_progress,
+    emerald=complete) with the total in the centre and a three-row legend
+    (count + %). Pure SVG in new `src/components/status-donut.tsx` — server
+    component, no client JS, no chart dependency. `STATUS_META` in
+    `status-badge.tsx` gained a `hex` field so the chart and badges share one
+    colour source.
+  - Developer-requested UI, part 2 — "Due soon" indicator: new derived helper
+    `isDueSoon(task)` in `src/db/tasks.ts` (due **today or tomorrow**, and not
+    complete / not archived / not already overdue). Task rows show an orange
+    "Due soon" pill + orange date text; the red "Overdue" state still wins.
+    Derived at read time, never stored (consistent with the `overdue` rule).
+  - Phase 6 complete at `145db94`: vitest (v4.1.10) under the `node`
+    environment, `vitest.config.mts`, `"test": "vitest run"` script. Tests in
+    `src/db/tasks.test.ts` (create→list round-trip, archive active-vs-archived,
+    `isOverdue` past+todo→true / complete→false / archived→false, `isDueSoon`
+    boundaries, `sortBy=due_date` ascending) and `src/app/api/tasks.test.ts`
+    (drives the real route handlers with `NextRequest`: POST create 201, then
+    GET `?sortBy=due_date` ordering). `beforeEach(() => resetDb(":memory:"))`
+    keeps every test on a throwaway DB.
+  - The new suite caught a real bug before it shipped: `isDueSoon` initially
+    returned `true` for complete tasks (it only delegated to `isOverdue`,
+    which returns `false` for complete). Fixed by checking `status`/`archived_at`
+    explicitly. This is a concrete instance of a test-driven correction worth
+    recording for Phase 8 evidence.
+  - Verified: `npm test` (10 passing), `npm run lint`, `npx tsc --noEmit`,
+    `npm run build` (all routes dynamic ƒ).
+
 ### Progress note (updated with each phase)
 
 - **2026-07-31 — Phase 2 complete** at `9c0be90`: `src/db/tasks.ts` shipped
@@ -99,6 +146,19 @@ checkpoint message, then update this table and stop for review.
   - `b7ef337` `src/app/archived/page.tsx` renders `listArchivedTasks()`.
   - `next build` verified: all pages/routes render dynamic (ƒ).
 
+- **2026-08-02 — Phase 6 complete** at `145db94`: `vitest` (4.1.10) added as
+  the only new devDependency; `vitest.config.mts` sets `environment: "node"`
+  (no jsdom/react); `"test": "vitest run"` added to `package.json`. Every test
+  starts with `beforeEach(() => resetDb(":memory:"))` — a throwaway DB, never
+  the dev `app.db`. `src/db/tasks.test.ts` covers the rubric-mandated minimum
+  (create→list round-trip with all fields; `archiveTask` moves a task from
+  `listTasks()` into `listArchivedTasks()`; `isOverdue` past+`todo`→true and
+  same task once `complete`→false) plus `isDueSoon` boundaries and
+  `sortBy=due_date` ascending. `src/app/api/tasks.test.ts` drives the real
+  route handlers with `NextRequest` (POST → 201, then GET
+  `?sortBy=due_date`). 10 tests pass from the single documented command
+  `npm test`.
+
 ---
 
 ## Handoff — session 3 (read this first)
@@ -123,9 +183,16 @@ checkpoint message, then update this table and stop for review.
     `<select>` (still the 3 fixed values). The page shows 4 stat cards (total /
     to start / in progress / completed). Dark mode is forced via `globals.css`
     (`color-scheme: dark`).
-  - A dev server may already be running on port 3000 (PID 20332) — do not kill
-    it; use it to sanity-check renders. If starting a second server for tests,
-    use `-p 3123` with a temp `DB_PATH`.
+  - A dev server may already be running on port 3000 — use it to sanity-check
+    renders. If starting a second server for tests, use `-p 3123` with a temp
+    `DB_PATH`.
+  - **Stale-`.next` 404 symptom (hit 2026-08-02):** if a dev server only serves
+    `/` and returns 404 for every other route (`/archived`, `/api/*`), the
+    running server's route table is out of sync with the filesystem — usually
+    `.next` survived an unclean shutdown. This is **not** a data-persistence
+    problem (the DB/WAL data is intact). Remedy: kill the dev server process
+    tree, run `npm run clean` (deletes `.next`; regenerates on next start), then
+    restart `npm run dev`.
 - `node -v` = **v24.14.1** (state "Node 24.x" in `docs/running-it.md`),
   `npm -v` = 11.11.0. `better-sqlite3@13.0.2` confirmed working on Node 24.
 - This is a modified Next.js (16.2.12). Per `AGENTS.md`, read
