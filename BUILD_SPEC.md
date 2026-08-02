@@ -23,7 +23,7 @@ checkpoint message, then update this table and stop for review.
 | 2 | Data access layer | Complete | `9c0be90` |
 | 3 | API routes | Complete | `23d6be3` |
 | 4 | Frontend | Complete | `0458162`, `662dde1`, `b7ef337` |
-| 5 | Persistence check | Not started | — |
+| 5 | Persistence check | Complete | — (manual, no commit) |
 | 6 | Testing | Complete | `145db94` |
 | 7 | Documentation | Not started | — |
 | 8 | AI usage transcripts | Not started | — |
@@ -115,6 +115,14 @@ checkpoint message, then update this table and stop for review.
   - Verified: `npm test` (10 passing), `npm run lint`, `npx tsc --noEmit`,
     `npm run build` (all routes dynamic ƒ).
 
+- **2026-08-02 — Session 5 (developer-verified Phase 5):** The developer
+  manually completed the Phase 5 persistence check: created a task and
+  confirmed it survived a `npm run dev` restart; edited a task and confirmed
+  the change survived a page reload; archived a task and confirmed it left the
+  active list on `/` but remained viewable at `/archived`. No code changes —
+  Phase 5 is a manual verification with no commit checkpoint, so only the
+  tracker is updated.
+
 ### Progress note (updated with each phase)
 
 - **2026-07-31 — Phase 2 complete** at `9c0be90`: `src/db/tasks.ts` shipped
@@ -145,6 +153,13 @@ checkpoint message, then update this table and stop for review.
     (PATCH), status `<select>` limited to the three values, and archive button.
   - `b7ef337` `src/app/archived/page.tsx` renders `listArchivedTasks()`.
   - `next build` verified: all pages/routes render dynamic (ƒ).
+
+- **2026-08-02 — Phase 5 complete (manual, no commit):** Developer verified
+  persistence exactly as the functional walkthrough will: create a task →
+  restart `npm run dev` → still present; edit a task → reload → change
+  survived; archive a task → gone from `/` but still viewable at `/archived`.
+  No code change was required; `data/app.db` (WAL mode) holds the data and is
+  auto-created from `schema.sql` on first run.
 
 - **2026-08-02 — Phase 6 complete** at `145db94`: `vitest` (4.1.10) added as
   the only new devDependency; `vitest.config.mts` sets `environment: "node"`
