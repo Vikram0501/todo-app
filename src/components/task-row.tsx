@@ -1,9 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import type { Task, TaskStatus, Topic } from "../db/tasks";
 import { StatusBadge, STATUS_META } from "./status-badge";
+import { archiveTaskAction, updateTaskAction } from "../actions";
 
 export type TaskRowData = Task & { overdue: boolean; dueSoon: boolean };
 
@@ -18,27 +18,20 @@ const inputClass =
   "mt-1 rounded-md border border-zinc-700 bg-zinc-900 px-2 py-1 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-500 focus:border-zinc-500";
 
 export function TaskRow({ task, topics }: { task: TaskRowData; topics: Topic[] }) {
-  const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function archive() {
-    const res = await fetch(`/api/tasks/${task.id}/archive`, {
-      method: "POST",
-    });
-    if (res.ok) {
-      router.refresh();
+    const result = await archiveTaskAction(task.id);
+    if (!result.ok) {
+      setError(result.error);
     }
   }
 
   async function changeStatus(status: TaskStatus) {
-    const res = await fetch(`/api/tasks/${task.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
-    if (res.ok) {
-      router.refresh();
+    const result = await updateTaskAction(task.id, { status });
+    if (!result.ok) {
+      setError(result.error);
     }
   }
 
@@ -56,18 +49,12 @@ export function TaskRow({ task, topics }: { task: TaskRowData; topics: Topic[] }
     if (description) {
       payload.description = description;
     }
-    const res = await fetch(`/api/tasks/${task.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json().catch(() => null);
-    if (!res.ok) {
-      setError(data?.error ?? "Failed to save task.");
+    const result = await updateTaskAction(task.id, payload);
+    if (!result.ok) {
+      setError(result.error);
       return;
     }
     setEditing(false);
-    router.refresh();
   }
 
   if (editing) {

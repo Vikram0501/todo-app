@@ -1,13 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import type { Topic } from "../db/tasks";
+import { createTaskAction } from "../actions";
 
 type TopicMode = "existing" | "new";
 
 export function CreateTaskForm({ topics }: { topics: Topic[] }) {
-  const router = useRouter();
   const [topicMode, setTopicMode] = useState<TopicMode>(
     topics.length > 0 ? "existing" : "new"
   );
@@ -34,18 +33,12 @@ export function CreateTaskForm({ topics }: { topics: Topic[] }) {
       payload.topicName = form.get("newTopicName");
     }
     try {
-      const res = await fetch("/api/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok) {
-        setError(data?.error ?? "Failed to create task.");
+      const result = await createTaskAction(payload);
+      if (!result.ok) {
+        setError(result.error);
         return;
       }
       formEl.reset();
-      router.refresh();
     } finally {
       setPending(false);
     }
