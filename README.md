@@ -80,3 +80,14 @@ to `data/app.db` relative to the project root. Set `DB_PATH` to a temp file
   how overdue is derived.
 - [`docs/third-party-code.md`](docs/third-party-code.md) — packages added
   beyond the scaffold and why.
+
+## AI Usage
+
+- This repository makes use of AI code generation using the following tools: OpenCode[DeepSeek V4 Flash Free (New)]
+- This repository does not use AI in-line editing tools.
+- This repository makes use of AI code-review using the following tools: OpenCode[DeepSeek V4 Flash Free (New)]
+- This repository makes use of AI document generation using the following tools: OpenCode[DeepSeek V4 Flash Free (New)], Claude-Web[Sonnet 5]
+
+## AI Declaration
+
+-The preceding document was generated with: OpenCode[DeepSeek V4 Flash Free (New)]
