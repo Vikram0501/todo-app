@@ -72,3 +72,7 @@ fourth status value — it is never stored anywhere. The API responses include a
 derived `overdue: boolean` field, and the list page computes the same flag
 server-side, but both derive it fresh from the three stored fields above so it
 can never go stale as dates and statuses change.
+
+## AI Declaration
+
+-The preceding document was generated with: OpenCode[DeepSeek V4 Flash Free (New)]

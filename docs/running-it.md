@@ -53,3 +53,7 @@ your real `data/app.db` is never touched.
 The database path is read from the `DB_PATH` environment variable, defaulting
 to `data/app.db` relative to the project root. Set `DB_PATH` to a temp file
 (or `:memory:`) if you want the app to use a scratch database instead.
+
+## AI Declaration
+
+-The preceding document was generated with: OpenCode[DeepSeek V4 Flash Free (New)]

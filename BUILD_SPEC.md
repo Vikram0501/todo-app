@@ -26,8 +26,8 @@ checkpoint message, then update this table and stop for review.
 | 5 | Persistence check | Complete | — (manual, no commit) |
 | 6 | Testing | Complete | `145db94` |
 | 7 | Documentation | Complete | `77d3fc7` |
-| 8 | AI usage transcripts | Not started | — |
-| 9 | Final pre-submission checklist | Not started | — |
+| 8 | AI usage transcripts | Complete | `4eaa85f` |
+| 9 | Final pre-submission checklist | In progress (manual) | — |
 
 ### Session log
 
@@ -142,6 +142,28 @@ checkpoint message, then update this table and stop for review.
   conversation. Working tree clean. Remaining: Phase 8 (AI usage transcripts),
   Phase 9 (final checklist).
 
+- **2026-08-03 — Session 7 (Phase 8 complete + README repopulated):** Phase 8
+  complete at `4eaa85f` ("Added AI transcripts") — the AI-usage transcript was
+  committed directly from the saved conversation (this document + the session
+  logs above are the transcript, per Section 8). Work performed this sitting:
+  - Repopulated `README.md`: the scaffold boilerplate was emptied back in
+    session 2, and the README now stands on its own as the "follow the README
+    alone" entry point (functional walkthrough step 1). It contains the full
+    running instructions inline — copied from `docs/running-it.md` (Node 24.x
+    requirement, `git clone`, `npm install`, the explicit "no manual DB setup —
+    `data/app.db` auto-created from `schema.sql`" statement, `npm run dev` →
+    `http://localhost:3000`, `npm test`) — plus a Features overview, a short
+    Tech stack section, the other commands (`lint` / `tsc` / `build` /
+    `clean`) and `DB_PATH` config, and links to the three graded `/docs` files.
+    The README is now self-sufficient for installation/startup while the `/docs`
+    files keep the graded detail.
+  - Developer added the `AI Declaration` section to `BUILD_SPEC.md` and to all
+    three `/docs` files (uncommitted as of this log entry).
+  - Phase 9 (final pre-submission checklist, bottom of this file) is left for
+    the developer to run manually — no code changes required. Commit count is
+    now 22, well past the "at least 6, spread across more than one sitting"
+    bar.
+
 ### Progress note (updated with each phase)
 
 - **2026-07-31 — Phase 2 complete** at `9c0be90`: `src/db/tasks.ts` shipped
@@ -180,6 +202,17 @@ checkpoint message, then update this table and stop for review.
   No code change was required; `data/app.db` (WAL mode) holds the data and is
   auto-created from `schema.sql` on first run.
 
+- **2026-08-03 — Phase 8 complete** at `4eaa85f` ("Added AI transcripts").
+  The AI-usage transcript was committed directly from the saved conversation —
+  this document (constraints stated up front, design decisions, and the session
+  log) **is** the transcript, per Section 8. The top band's evidence is on
+  record: constraints stated up front (Section 1), plus two clear
+  rejected/corrected AI outputs — the `isDueSoon` bug the test suite caught
+  (session 4) and the stale-`.next` misdiagnosis rejected in session 3 (it was
+  **not** a data-persistence failure). `README.md` was also repopulated as the
+  self-sufficient "follow the README alone" entry point, inlining the full
+  running instructions from `docs/running-it.md`.
+
 - **2026-08-02 — Phase 6 complete** at `145db94`: `vitest` (4.1.10) added as
   the only new devDependency; `vitest.config.mts` sets `environment: "node"`
   (no jsdom/react); `"test": "vitest run"` added to `package.json`. Every test
@@ -195,24 +228,28 @@ checkpoint message, then update this table and stop for review.
 
 ---
 
-## Handoff — session 6 (read this first)
+## Handoff — session 7 (read this first)
 
-### Current state (end of session 5, 2026-08-02)
+### Current state (end of session 7, 2026-08-03)
 
-- **Working tree is clean** (all changes through session 5 are committed). Git
-  history (17 commits, all on `main`):
+- **Working tree:** phases 1–8 are committed; uncommitted changes are the
+  `README.md` repopulation and the developer's `AI Declaration` additions to
+  `BUILD_SPEC.md` and the three `/docs` files. Git history (22 commits, all on
+  `main`):
   `37a9931` scaffold → `80de7c9` → `9c0be90` → `168627f` (tracker) → `23d6be3`
   → `369c6a7` (tracker) → `0458162` → `662dde1` → `b7ef337` → `e42bc79`
   (tracker) → `1aa223e` (handoff) → `6b279f8` (bug fix + UI revamp +
   AIUSAGE/README) → `4c7ac3e` (handoff) → `145db94` (test suite + `isDueSoon`)
-  → `48716ad` (donut + due-soon UI) → `90d750c` (tracker) → `399d6f5` (tracker).
-- **Done:** phases 1–6. **Remaining:** 7 (docs), 8 (AI transcripts —
-  `AIUSAGE.md` draft exists), 9 (final checklist).
-- **Next action (session 6):** Phase 7 — documentation. Write the three `/docs`
-  files as planned below, then **verify against a clean clone in a fresh
-  folder** — that verification is literally how it's marked (functional
-  walkthrough step 1, and the top band of the Documentation rubric requires
-  it). Commit checkpoint 6, update the tracker, stop for review.
+  → `48716ad` (donut + due-soon UI) → `90d750c` (tracker) → `399d6f5` (tracker)
+  → `54a9a8c` (handoff) → `3fd713c` (removed stale AIUSAGE draft) → `77d3fc7`
+  (Phase 7 docs) → `3c22ca9` (tracker) → `4eaa85f` (Phase 8 AI transcripts).
+- **Done:** phases 1–8. **Remaining:** 9 (final pre-submission checklist —
+  developer runs it manually).
+- **Next action (session 7):** the developer runs the Phase 9 checklist at the
+  bottom of this file by hand — clean clone + `npm install` + `npm run dev`,
+  the CRUD/archive/sort/overdue walkthrough, `npm test`, docs present and
+  matching, commit count (22) and AI transcripts on record. No code changes
+  expected. After that: commit the uncommitted README + AI Declaration changes.
 - **Known quirks to remember this sitting:**
   - Session 4 changed the UI on `/`: the four stat cards were replaced by one
     combined "Total tasks" tracker card holding a single-segment donut
@@ -305,18 +342,19 @@ and confirm the app starts and `npm test` passes. Commit checkpoint 6:
 
 ### Phase 8–9 — transcripts and final checklist
 
-- This document + the saved conversation(s) are the AI-usage transcript.
-  Evidence already on hand: constraints stated up front (this doc), plus two
-  clear instances of correcting/rejecting AI output — the `isDueSoon` bug the
-  test suite caught (session 4 log) and the stale-`.next` misdiagnosis
-  rejected in session 3 (it was **not** a data-persistence failure).
-  `AIUSAGE.md` is the draft to complete.
+- This document + the saved conversation(s) are the AI-usage transcript, and
+  Phase 8 is complete at `4eaa85f`. Evidence on hand: constraints stated up
+  front (this doc), plus two clear instances of correcting/rejecting AI output
+  — the `isDueSoon` bug the test suite caught (session 4 log) and the
+  stale-`.next` misdiagnosis rejected in session 3 (it was **not** a
+  data-persistence failure).
   If any future proposal drifts from Section 1 (e.g. storing `overdue`, a
   `deleteTask`, a fourth status, moving archived rows to another table),
   **reject it explicitly in the conversation** and record it here — that
   rejection is the grading evidence.
-- Phase 9: run the checklist at the bottom of this file. Commit count (17)
-  already exceeds the "at least 6, spread across more than one sitting" bar.
+- Phase 9: the developer runs the checklist at the bottom of this file
+  manually. Commit count (22) already exceeds the "at least 6, spread across
+  more than one sitting" bar.
 
 ---
 
@@ -619,3 +657,7 @@ walkthrough exactly:
       sitting
 - [ ] AI usage transcripts saved, showing at least one rejected/corrected
       output
+
+## AI Declaration
+
+-The preceding document was generated with: OpenCode[DeepSeek V4 Flash Free (New)]

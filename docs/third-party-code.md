@@ -12,3 +12,7 @@ dependencies — `next`, `react`, `react-dom`, `typescript`, `tailwindcss`,
 - **vitest** — test runner; chosen for fast startup and native TypeScript/ESM
   support without extra config, needed for a documented single test command
   (`npm test`).
+
+## AI Declaration
+
+-The preceding document was generated with: OpenCode[DeepSeek V4 Flash Free (New)]
